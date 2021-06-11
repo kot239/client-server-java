@@ -1,0 +1,69 @@
+buildscript { // Configuration for building
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.+'
+    }
+}
+
+plugins {
+    id 'com.google.protobuf' version '0.8.10'
+    id 'groovy'
+    id 'java'
+}
+
+apply plugin: 'com.google.protobuf'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:3.0.5'
+    implementation 'com.google.protobuf:protobuf-java:3.15.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+        }
+    }
+    test {
+        java {
+            srcDirs 'src/test/java'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.10.1'
+    }
+
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
+        }
+    }
+
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+
+compileJava {
+    options.release.set(11)
+}
+
+test {
+    useJUnitPlatform()
+}
