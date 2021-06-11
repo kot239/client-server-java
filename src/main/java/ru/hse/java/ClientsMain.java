@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ClientsMain {
-    private static final int m = 20;
-    private static final int n = 20;
+    private static final int m = 20; // number of clients
+    private static final int n = 200000; // size of array
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         ExecutorService clientsThreadPool = Executors.newCachedThreadPool();

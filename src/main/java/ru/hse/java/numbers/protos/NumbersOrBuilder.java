@@ -8,17 +8,28 @@ public interface NumbersOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>required int32 size = 1;</code>
+   * @return Whether the size field is set.
+   */
+  boolean hasSize();
+  /**
+   * <code>required int32 size = 1;</code>
+   * @return The size.
+   */
+  int getSize();
+
+  /**
+   * <code>repeated int32 numbers = 2;</code>
    * @return A list containing the numbers.
    */
   java.util.List<java.lang.Integer> getNumbersList();
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>repeated int32 numbers = 2;</code>
    * @return The count of numbers.
    */
   int getNumbersCount();
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>repeated int32 numbers = 2;</code>
    * @param index The index of the element to return.
    * @return The numbers at the given index.
    */

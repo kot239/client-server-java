@@ -2,7 +2,6 @@ package ru.hse.java;
 
 import ru.hse.java.numbers.protos.Numbers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,6 +29,7 @@ public class Client implements Callable<Void> {
                 .boxed()
                 .collect(Collectors.toList());
         Numbers.Builder numbers = Numbers.newBuilder();
+        numbers.setSize(n);
         numbers.addAllNumbers(list);
         return numbers.build();
     }
@@ -37,19 +37,13 @@ public class Client implements Callable<Void> {
     @Override
     public Void call() {
         Numbers data = generateData();
-        byte[] dataBytes = data.toByteArray();
         try (Socket socket = new Socket(Constants.LOCALHOST, Constants.PORT)) {
             DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-            os.write(dataBytes);
-            os.flush();
+            data.writeDelimitedTo(os);
             System.out.println("Client #" + id + " send data to server");
 
             DataInputStream is = new DataInputStream(socket.getInputStream());
-            byte[] rawData = new byte[1024];
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(rawData, 0, is.read(rawData));
-            byte[] receivedData = baos.toByteArray();
-            Numbers sortedData = Numbers.parseFrom(receivedData);
+            Numbers sortedData = Numbers.parseDelimitedFrom(is);
             checkSorting(sortedData);
         } catch (IOException e) {
             System.out.println("Lost connection to server");

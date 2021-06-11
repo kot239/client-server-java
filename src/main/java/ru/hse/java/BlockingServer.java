@@ -8,6 +8,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,11 +90,7 @@ public class BlockingServer {
             receivingThread.submit(() -> {
                 try {
                     while (isReceiving) {
-                        byte[] rawData = new byte[1024];
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        baos.write(rawData, 0, is.read(rawData));
-                        byte[] receivedData = baos.toByteArray();
-                        List<Integer> numbers = Numbers.parseFrom(receivedData).getNumbersList();
+                        List<Integer> numbers = Numbers.parseDelimitedFrom(is).getNumbersList();
                         threadPool.submit(() ->
                                 sendToClient(bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
                         );
@@ -106,12 +104,10 @@ public class BlockingServer {
         public void sendToClient(int[] data) {
             sendingThread.submit(() -> {
                 try {
-                    byte[] sendingData = Numbers.newBuilder()
-                            .addAllNumbers(Arrays.stream(data).boxed().collect(Collectors.toList()))
-                            .build()
-                            .toByteArray();
-                    os.write(sendingData);
-                    os.flush();
+                    Numbers.Builder numbers = Numbers.newBuilder()
+                            .addAllNumbers(Arrays.stream(data).boxed().collect(Collectors.toList()));
+                    numbers.setSize(data.length);
+                    numbers.build().writeDelimitedTo(os);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

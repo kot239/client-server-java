@@ -51,19 +51,24 @@ private static final long serialVersionUID = 0L;
             done = true;
             break;
           case 8: {
-            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+            bitField0_ |= 0x00000001;
+            size_ = input.readInt32();
+            break;
+          }
+          case 16: {
+            if (!((mutable_bitField0_ & 0x00000002) != 0)) {
               numbers_ = newIntList();
-              mutable_bitField0_ |= 0x00000001;
+              mutable_bitField0_ |= 0x00000002;
             }
             numbers_.addInt(input.readInt32());
             break;
           }
-          case 10: {
+          case 18: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
-            if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
+            if (!((mutable_bitField0_ & 0x00000002) != 0) && input.getBytesUntilLimit() > 0) {
               numbers_ = newIntList();
-              mutable_bitField0_ |= 0x00000001;
+              mutable_bitField0_ |= 0x00000002;
             }
             while (input.getBytesUntilLimit() > 0) {
               numbers_.addInt(input.readInt32());
@@ -86,7 +91,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000001) != 0)) {
+      if (((mutable_bitField0_ & 0x00000002) != 0)) {
         numbers_.makeImmutable(); // C
       }
       this.unknownFields = unknownFields.build();
@@ -106,10 +111,30 @@ private static final long serialVersionUID = 0L;
             ru.hse.java.numbers.protos.Numbers.class, ru.hse.java.numbers.protos.Numbers.Builder.class);
   }
 
-  public static final int NUMBERS_FIELD_NUMBER = 1;
+  private int bitField0_;
+  public static final int SIZE_FIELD_NUMBER = 1;
+  private int size_;
+  /**
+   * <code>required int32 size = 1;</code>
+   * @return Whether the size field is set.
+   */
+  @java.lang.Override
+  public boolean hasSize() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <code>required int32 size = 1;</code>
+   * @return The size.
+   */
+  @java.lang.Override
+  public int getSize() {
+    return size_;
+  }
+
+  public static final int NUMBERS_FIELD_NUMBER = 2;
   private com.google.protobuf.Internal.IntList numbers_;
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>repeated int32 numbers = 2;</code>
    * @return A list containing the numbers.
    */
   @java.lang.Override
@@ -118,14 +143,14 @@ private static final long serialVersionUID = 0L;
     return numbers_;
   }
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>repeated int32 numbers = 2;</code>
    * @return The count of numbers.
    */
   public int getNumbersCount() {
     return numbers_.size();
   }
   /**
-   * <code>repeated int32 numbers = 1;</code>
+   * <code>repeated int32 numbers = 2;</code>
    * @param index The index of the element to return.
    * @return The numbers at the given index.
    */
@@ -140,6 +165,10 @@ private static final long serialVersionUID = 0L;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
+    if (!hasSize()) {
+      memoizedIsInitialized = 0;
+      return false;
+    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -147,8 +176,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeInt32(1, size_);
+    }
     for (int i = 0; i < numbers_.size(); i++) {
-      output.writeInt32(1, numbers_.getInt(i));
+      output.writeInt32(2, numbers_.getInt(i));
     }
     unknownFields.writeTo(output);
   }
@@ -159,6 +191,10 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(1, size_);
+    }
     {
       int dataSize = 0;
       for (int i = 0; i < numbers_.size(); i++) {
@@ -183,6 +219,11 @@ private static final long serialVersionUID = 0L;
     }
     ru.hse.java.numbers.protos.Numbers other = (ru.hse.java.numbers.protos.Numbers) obj;
 
+    if (hasSize() != other.hasSize()) return false;
+    if (hasSize()) {
+      if (getSize()
+          != other.getSize()) return false;
+    }
     if (!getNumbersList()
         .equals(other.getNumbersList())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
@@ -196,6 +237,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasSize()) {
+      hash = (37 * hash) + SIZE_FIELD_NUMBER;
+      hash = (53 * hash) + getSize();
+    }
     if (getNumbersCount() > 0) {
       hash = (37 * hash) + NUMBERS_FIELD_NUMBER;
       hash = (53 * hash) + getNumbersList().hashCode();
@@ -333,8 +378,10 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
-      numbers_ = emptyIntList();
+      size_ = 0;
       bitField0_ = (bitField0_ & ~0x00000001);
+      numbers_ = emptyIntList();
+      bitField0_ = (bitField0_ & ~0x00000002);
       return this;
     }
 
@@ -362,11 +409,17 @@ private static final long serialVersionUID = 0L;
     public ru.hse.java.numbers.protos.Numbers buildPartial() {
       ru.hse.java.numbers.protos.Numbers result = new ru.hse.java.numbers.protos.Numbers(this);
       int from_bitField0_ = bitField0_;
-      if (((bitField0_ & 0x00000001) != 0)) {
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.size_ = size_;
+        to_bitField0_ |= 0x00000001;
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
         numbers_.makeImmutable();
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
       }
       result.numbers_ = numbers_;
+      result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
     }
@@ -415,10 +468,13 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(ru.hse.java.numbers.protos.Numbers other) {
       if (other == ru.hse.java.numbers.protos.Numbers.getDefaultInstance()) return this;
+      if (other.hasSize()) {
+        setSize(other.getSize());
+      }
       if (!other.numbers_.isEmpty()) {
         if (numbers_.isEmpty()) {
           numbers_ = other.numbers_;
-          bitField0_ = (bitField0_ & ~0x00000001);
+          bitField0_ = (bitField0_ & ~0x00000002);
         } else {
           ensureNumbersIsMutable();
           numbers_.addAll(other.numbers_);
@@ -432,6 +488,9 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public final boolean isInitialized() {
+      if (!hasSize()) {
+        return false;
+      }
       return true;
     }
 
@@ -455,31 +514,70 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
+    private int size_ ;
+    /**
+     * <code>required int32 size = 1;</code>
+     * @return Whether the size field is set.
+     */
+    @java.lang.Override
+    public boolean hasSize() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>required int32 size = 1;</code>
+     * @return The size.
+     */
+    @java.lang.Override
+    public int getSize() {
+      return size_;
+    }
+    /**
+     * <code>required int32 size = 1;</code>
+     * @param value The size to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSize(int value) {
+      bitField0_ |= 0x00000001;
+      size_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>required int32 size = 1;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSize() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      size_ = 0;
+      onChanged();
+      return this;
+    }
+
     private com.google.protobuf.Internal.IntList numbers_ = emptyIntList();
     private void ensureNumbersIsMutable() {
-      if (!((bitField0_ & 0x00000001) != 0)) {
+      if (!((bitField0_ & 0x00000002) != 0)) {
         numbers_ = mutableCopy(numbers_);
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
        }
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @return A list containing the numbers.
      */
     public java.util.List<java.lang.Integer>
         getNumbersList() {
-      return ((bitField0_ & 0x00000001) != 0) ?
+      return ((bitField0_ & 0x00000002) != 0) ?
                java.util.Collections.unmodifiableList(numbers_) : numbers_;
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @return The count of numbers.
      */
     public int getNumbersCount() {
       return numbers_.size();
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @param index The index of the element to return.
      * @return The numbers at the given index.
      */
@@ -487,7 +585,7 @@ private static final long serialVersionUID = 0L;
       return numbers_.getInt(index);
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @param index The index to set the value at.
      * @param value The numbers to set.
      * @return This builder for chaining.
@@ -500,7 +598,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @param value The numbers to add.
      * @return This builder for chaining.
      */
@@ -511,7 +609,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @param values The numbers to add.
      * @return This builder for chaining.
      */
@@ -524,12 +622,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated int32 numbers = 1;</code>
+     * <code>repeated int32 numbers = 2;</code>
      * @return This builder for chaining.
      */
     public Builder clearNumbers() {
       numbers_ = emptyIntList();
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }

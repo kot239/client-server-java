@@ -28,9 +28,9 @@ public final class NumbersProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rnumbers.proto\"\032\n\007Numbers\022\017\n\007numbers\030\001 " +
-      "\003(\005B-\n\032ru.hse.java.numbers.protosB\rNumbe" +
-      "rsProtosP\001"
+      "\n\rnumbers.proto\"(\n\007Numbers\022\014\n\004size\030\001 \002(\005" +
+      "\022\017\n\007numbers\030\002 \003(\005B-\n\032ru.hse.java.numbers" +
+      ".protosB\rNumbersProtosP\001"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -41,7 +41,7 @@ public final class NumbersProtos {
     internal_static_Numbers_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Numbers_descriptor,
-        new java.lang.String[] { "Numbers", });
+        new java.lang.String[] { "Size", "Numbers", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
