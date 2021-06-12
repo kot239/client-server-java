@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class ServerMain {
     public static void main(String[] args) {
         try {
-            BlockingServer server = new BlockingServer();
+            NonBlockingServer server = new NonBlockingServer();
             server.run();
             Scanner scanner = new Scanner(System.in);
             while (true) {
@@ -16,7 +16,7 @@ public class ServerMain {
                     break;
                 }
             }
-            server.stop();
+            server.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

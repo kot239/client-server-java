@@ -17,7 +17,7 @@ public class ClientsMain {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         ExecutorService clientsThreadPool = Executors.newCachedThreadPool();
         List<Future<Void>> futures = clientsThreadPool.invokeAll(
-                IntStream.range(0, m).mapToObj(i -> new Client(i + 1, n, x, delta)).collect(Collectors.toList())
+                IntStream.range(0, m).mapToObj(i -> new NonBlockingClient(i + 1, n, x, delta)).collect(Collectors.toList())
         );
         for (Future<Void> future : futures) {
             future.get();

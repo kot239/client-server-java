@@ -19,34 +19,21 @@ import java.util.stream.Collectors;
 
 public class BlockingServer {
 
-    private int[] bubbleSort(int[] input) {
-        int n = input.length;
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - 1 - i; j++) {
-                if (input[j] > input[j + 1]) {
-                    int t = input[j];
-                    input[j] = input[j + 1];
-                    input[j + 1] = t;
-                }
-            }
-        }
-        return input;
-    }
-
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 2);;
     private ServerSocket serverSocket;
 
-    private volatile boolean isWorking = true;
+    private volatile boolean isWorking = false;
 
     private final ConcurrentHashMap.KeySetView<ClientData, Boolean> clients = ConcurrentHashMap.newKeySet();
 
     public void run() throws IOException {
+        isWorking = true;
         serverSocket = new ServerSocket(Constants.PORT);
         serverSocketService.submit(this::acceptClient);
     }
 
-    public void stop() throws IOException {
+    public void close() throws IOException {
         isWorking = false;
         serverSocket.close();
         threadPool.shutdown();
@@ -92,7 +79,7 @@ public class BlockingServer {
                     while (isReceiving) {
                         List<Integer> numbers = Numbers.parseDelimitedFrom(is).getNumbersList();
                         threadPool.submit(() ->
-                                sendToClient(bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
+                                sendToClient(Sort.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
                         );
                     }
                 } catch (IOException e) {
