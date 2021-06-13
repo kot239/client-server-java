@@ -1,39 +1,42 @@
-ru/hse/java/AsynchronousServer.java
- ru.hse.java.AsynchronousServer
- ru.hse.java.AsynchronousServer$1
- ru.hse.java.AsynchronousServer$ClientHandler
- ru.hse.java.AsynchronousServer$Info
-ru/hse/java/ServerUtils.java
- ru.hse.java.ServerUtils
+ru/hse/java/numbers/protos/NumbersProtos.java
+ ru.hse.java.numbers.protos.NumbersProtos
 ru/hse/java/numbers/protos/Numbers.java
  ru.hse.java.numbers.protos.Numbers
  ru.hse.java.numbers.protos.Numbers$1
  ru.hse.java.numbers.protos.Numbers$Builder
-ru/hse/java/numbers/protos/NumbersProtos.java
- ru.hse.java.numbers.protos.NumbersProtos
-ru/hse/java/LogWriter.java
- ru.hse.java.LogWriter
-ru/hse/java/Constants.java
- ru.hse.java.Constants
+ru/hse/java/utils/ServerUtils.java
+ ru.hse.java.utils.ServerUtils
+ru/hse/java/utils/Constants.java
+ ru.hse.java.utils.Constants
 ru/hse/java/numbers/protos/NumbersOrBuilder.java
  ru.hse.java.numbers.protos.NumbersOrBuilder
-ru/hse/java/NonBlockingServer.java
- ru.hse.java.NonBlockingServer
- ru.hse.java.NonBlockingServer$ClientData
-ru/hse/java/Server.java
- ru.hse.java.Server
-ru/hse/java/ClientNumbers.java
- ru.hse.java.ClientNumbers
-ru/hse/java/BlockingServer.java
- ru.hse.java.BlockingServer
- ru.hse.java.BlockingServer$ClientData
+ru/hse/java/utils/ClientNumbers.java
+ ru.hse.java.utils.ClientNumbers
+ru/hse/java/clients/Client.java
+ ru.hse.java.clients.Client
+ru/hse/java/clients/AsynchronousClient.java
+ ru.hse.java.clients.AsynchronousClient
+ru/hse/java/utils/LogCSVWriter.java
+ ru.hse.java.utils.LogCSVWriter
+ru/hse/java/clients/NonBlockingClient.java
+ ru.hse.java.clients.NonBlockingClient
+ru/hse/java/clients/BlockingClient.java
+ ru.hse.java.clients.BlockingClient
+ru/hse/java/servers/Server.java
+ ru.hse.java.servers.Server
+ru/hse/java/servers/BlockingServer.java
+ ru.hse.java.servers.BlockingServer
+ ru.hse.java.servers.BlockingServer$ClientData
+ru/hse/java/servers/AsynchronousServer.java
+ ru.hse.java.servers.AsynchronousServer
+ ru.hse.java.servers.AsynchronousServer$1
+ ru.hse.java.servers.AsynchronousServer$ClientHandler
+ ru.hse.java.servers.AsynchronousServer$Info
 ru/hse/java/Main.java
  ru.hse.java.Main
-ru/hse/java/Client.java
- ru.hse.java.Client
-ru/hse/java/BlockingClient.java
- ru.hse.java.BlockingClient
-ru/hse/java/AsynchronousClient.java
- ru.hse.java.AsynchronousClient
-ru/hse/java/NonBlockingClient.java
- ru.hse.java.NonBlockingClient
+ ru.hse.java.Main$1
+ ru.hse.java.Main$Architectures
+ ru.hse.java.Main$Parameter
+ru/hse/java/servers/NonBlockingServer.java
+ ru.hse.java.servers.NonBlockingServer
+ ru.hse.java.servers.NonBlockingServer$ClientData
