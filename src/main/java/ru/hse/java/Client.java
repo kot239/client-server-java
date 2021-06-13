@@ -2,6 +2,7 @@ package ru.hse.java;
 
 import ru.hse.java.numbers.protos.Numbers;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -50,5 +51,14 @@ public abstract class Client implements Callable<Void> {
             }
         }
         System.out.println("Client #" + id + " successfully received #" + k + " data");
+    }
+
+    protected ByteBuffer prepareSource() {
+        Numbers numbers = generateData();
+        ByteBuffer source = ByteBuffer.allocate(Integer.BYTES + numbers.getSerializedSize());
+        source.putInt(numbers.getSerializedSize());
+        source.put(numbers.toByteArray());
+        source.flip();
+        return source;
     }
 }

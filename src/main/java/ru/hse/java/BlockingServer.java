@@ -2,14 +2,11 @@ package ru.hse.java;
 
 import ru.hse.java.numbers.protos.Numbers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,7 +76,7 @@ public class BlockingServer {
                     while (isReceiving) {
                         List<Integer> numbers = Numbers.parseDelimitedFrom(is).getNumbersList();
                         threadPool.submit(() ->
-                                sendToClient(Sort.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
+                                sendToClient(ServerUtils.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
                         );
                     }
                 } catch (IOException e) {

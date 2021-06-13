@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class ServerMain {
     public static void main(String[] args) {
         try {
-            NonBlockingServer server = new NonBlockingServer();
+            AsynchronousServer server = new AsynchronousServer();
             server.run();
             Scanner scanner = new Scanner(System.in);
             while (true) {

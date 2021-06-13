@@ -150,7 +150,7 @@ public class NonBlockingServer {
             receivingSource.flip();
             List<Integer> numbers = Numbers.parseFrom(receivingSource.array()).getNumbersList();
             threadPool.submit(() -> {
-                    setData(Sort.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()));
+                    setData(ServerUtils.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()));
                     isReady = true;
             });
         }
@@ -161,14 +161,7 @@ public class NonBlockingServer {
 
         public void sendToClient() {
             try {
-                Numbers.Builder numbersBuilder = Numbers.newBuilder()
-                        .addAllNumbers(Arrays.stream(data).boxed().collect(Collectors.toList()));
-                numbersBuilder.setSize(data.length);
-                Numbers numbers = numbersBuilder.build();
-                ByteBuffer source = ByteBuffer.allocate(Integer.BYTES + numbers.getSerializedSize());
-                source.putInt(numbers.getSerializedSize());
-                source.put(numbers.toByteArray());
-                source.flip();
+                ByteBuffer source = ServerUtils.arrayToByteBuffer(data);
                 int sendingSize = 0;
                 int curSending;
                 while (source.hasRemaining()) {

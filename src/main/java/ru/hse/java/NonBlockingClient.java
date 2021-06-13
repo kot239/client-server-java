@@ -17,11 +17,7 @@ public class NonBlockingClient extends Client {
     public Void call() {
         try (SocketChannel channel = SocketChannel.open(new InetSocketAddress(Constants.LOCALHOST, Constants.PORT))) {
             for (int i = 0; i < x; i++) {
-                Numbers numbers = generateData();
-                ByteBuffer source = ByteBuffer.allocate(Integer.BYTES + numbers.getSerializedSize());
-                source.putInt(numbers.getSerializedSize());
-                source.put(numbers.toByteArray());
-                source.flip();
+                ByteBuffer source = prepareSource();
                 while (source.hasRemaining()) {
                     channel.write(source);
                 }
