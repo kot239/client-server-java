@@ -9,12 +9,12 @@ import java.nio.channels.SocketChannel;
 
 public class NonBlockingClient extends Client {
 
-    public NonBlockingClient(int id, int n, int x, int delta) {
-        super(id, n, x, delta, "NonBlockingClientLog.txt");
+    public NonBlockingClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers) {
+        super(id, m, n, x, delta, "NonBlockingClientLog.txt", clientNumbers);
     }
 
     @Override
-    public Void call() {
+    public Double call() {
         try (SocketChannel channel = SocketChannel.open(new InetSocketAddress(Constants.LOCALHOST, Constants.PORT))) {
             for (int i = 0; i < x; i++) {
                 ByteBuffer source = prepareSource();
@@ -22,6 +22,7 @@ public class NonBlockingClient extends Client {
                     channel.write(source);
                 }
                 LogWriter.writeToLog(logPath, "Client #" + id + " send #" + i + " data to server\n");
+                long startTime = System.currentTimeMillis();
 
                 ByteBuffer receivingHeader = ByteBuffer.allocate(Integer.BYTES);
                 int receivedBytes;
@@ -38,14 +39,18 @@ public class NonBlockingClient extends Client {
                     receivedBytes = channel.read(receivingSource);
                     totalReceivedBytes -= receivedBytes;
                 }
+                if (m == clientNumbers.getNumber()) {
+                    times.add(System.currentTimeMillis() - startTime);
+                }
                 checkSorting(Numbers.parseFrom(receivingSource.array()), i);
 
                 Thread.sleep(delta);
             }
+            return returnClientTime();
         } catch (IOException e) {
             LogWriter.writeToLog(logPath, "Lost connection to server\n");
         } catch (InterruptedException ignored) {
         }
-        return null;
+        return -1d;
     }
 }

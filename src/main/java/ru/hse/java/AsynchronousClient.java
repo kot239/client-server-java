@@ -11,12 +11,12 @@ import java.util.concurrent.Future;
 
 public class AsynchronousClient extends Client {
 
-    public AsynchronousClient(int id, int n, int x, int delta) {
-        super(id, n, x, delta, "AsynchronousClientLog.txt");
+    public AsynchronousClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers) {
+        super(id, m, n, x, delta, "AsynchronousClientLog.txt", clientNumbers);
     }
 
     @Override
-    public Void call() {
+    public Double call() {
         try (AsynchronousSocketChannel channel = AsynchronousSocketChannel.open()) {
             Future<Void> future = channel.connect(new InetSocketAddress(Constants.LOCALHOST, Constants.PORT));
             future.get();
@@ -26,6 +26,7 @@ public class AsynchronousClient extends Client {
                     channel.write(source);
                 }
                 LogWriter.writeToLog(logPath,"Client #" + id + " send #" + i + " data to server\n");
+                long startTime = System.currentTimeMillis();
 
                 ByteBuffer receivingHeader = ByteBuffer.allocate(Integer.BYTES);
                 Future<Integer> receivedBytes;
@@ -42,16 +43,20 @@ public class AsynchronousClient extends Client {
                     receivedBytes = channel.read(receivingSource);
                     totalReceivedBytes -= receivedBytes.get();
                 }
+                if (m == clientNumbers.getNumber()) {
+                    times.add(System.currentTimeMillis() - startTime);
+                }
                 checkSorting(Numbers.parseFrom(receivingSource.array()), i);
 
                 Thread.sleep(delta);
             }
+            return returnClientTime();
         } catch (IOException e) {
             LogWriter.writeToLog(logPath, "Lost connection to server\n");
         } catch (InterruptedException ignored) {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        return null;
+        return -1d;
     }
 }

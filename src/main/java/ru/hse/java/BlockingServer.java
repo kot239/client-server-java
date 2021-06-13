@@ -27,6 +27,10 @@ public class BlockingServer extends Server {
 
     private final ConcurrentHashMap.KeySetView<ClientData, Boolean> clients = ConcurrentHashMap.newKeySet();
 
+    BlockingServer(int m, ClientNumbers clientNumbers) {
+        super(m, clientNumbers);
+    }
+
     @Override
     public void run() throws IOException {
         isWorking = true;
@@ -35,12 +39,13 @@ public class BlockingServer extends Server {
     }
 
     @Override
-    public void close() throws IOException {
+    public double close() throws IOException {
         isWorking = false;
         serverSocket.close();
         threadPool.shutdown();
         serverSocketService.shutdown();
         clients.forEach(ClientData::close);
+        return returnServerTime();
     }
 
     public void acceptClient() {
@@ -48,6 +53,7 @@ public class BlockingServer extends Server {
             while (isWorking) {
                 Socket socket = serverSocket.accept();
                 LogWriter.writeToLog(logPath, "client accepted\n");
+                clientNumbers.incClients();
                 ClientData client = new ClientData(socket);
                 clients.add(client);
                 client.receiveFromClient();
@@ -68,6 +74,8 @@ public class BlockingServer extends Server {
 
         private boolean isReceiving;
 
+        private long startTime;
+
         private ClientData(Socket socket) throws IOException {
             this.socket = socket;
             isReceiving = true;
@@ -80,6 +88,7 @@ public class BlockingServer extends Server {
                 try {
                     while (isReceiving) {
                         List<Integer> numbers = Numbers.parseDelimitedFrom(is).getNumbersList();
+                        startTime = System.currentTimeMillis();
                         LogWriter.writeToLog(logPath, "receive data from client\n");
                         threadPool.submit(() ->
                                 sendToClient(ServerUtils.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
@@ -98,6 +107,7 @@ public class BlockingServer extends Server {
                             .addAllNumbers(Arrays.stream(data).boxed().collect(Collectors.toList()));
                     numbers.setSize(data.length);
                     numbers.build().writeDelimitedTo(os);
+                    addTimes(startTime);
                     LogWriter.writeToLog(logPath, "send data to client\n");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -111,6 +121,7 @@ public class BlockingServer extends Server {
             sendingThread.shutdown();
             try {
                 socket.close();
+                clientNumbers.decClients();
             } catch (IOException e) {
                 e.printStackTrace();
             }

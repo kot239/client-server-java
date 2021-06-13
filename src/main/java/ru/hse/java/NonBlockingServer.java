@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,6 +37,10 @@ public class NonBlockingServer extends Server {
 
     private final int x = 2;
 
+    NonBlockingServer(int m, ClientNumbers clientNumbers) {
+        super(m, clientNumbers);
+    }
+
     @Override
     public void run() throws IOException {
         isWorking = true;
@@ -47,9 +52,10 @@ public class NonBlockingServer extends Server {
     }
 
     @Override
-    public void close() throws IOException {
+    public double close() throws IOException {
         isWorking = false;
         serverSocketChannel.close();
+        return returnServerTime();
     }
 
     public void receiveMessages() {
@@ -68,6 +74,7 @@ public class NonBlockingServer extends Server {
                         SocketChannel socketChannel = serverSocketChannel.accept();
                         clients.put(socketChannel, new ClientData(socketChannel));
                         LogWriter.writeToLog(logPath, "client accepted\n");
+                        clientNumbers.incClients();
                     }
                     if (key.isReadable()) {
                         ClientData client = clients.get((SocketChannel) key.channel());
@@ -99,6 +106,7 @@ public class NonBlockingServer extends Server {
                         if (client.isReady) {
                             client.sendToClient();
                             client.close();
+                            clientNumbers.decClients();
                             LogWriter.writeToLog(logPath, "send data to client\n");
                         }
                     }
@@ -119,6 +127,8 @@ public class NonBlockingServer extends Server {
         private final SocketChannel socketChannel;
 
         private int tasks;
+
+        private long startTime;
 
         ClientData(SocketChannel socketChannel) throws IOException {
             this.socketChannel = socketChannel;
@@ -150,6 +160,7 @@ public class NonBlockingServer extends Server {
                 receivedBytes = socketChannel.read(receivingSource);
             } while (receivedBytes > 0);
             receivingSource.flip();
+            startTime = System.currentTimeMillis();
             List<Integer> numbers = Numbers.parseFrom(receivingSource.array()).getNumbersList();
             threadPool.submit(() -> {
                     setData(ServerUtils.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()));
@@ -167,6 +178,7 @@ public class NonBlockingServer extends Server {
                 while (source.hasRemaining()) {
                     socketChannel.write(source);
                 }
+                addTimes(startTime);
             } catch (IOException e) {
                 e.printStackTrace();
             }

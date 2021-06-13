@@ -25,7 +25,8 @@ public class AsynchronousServer extends Server {
 
     private final int x = 2;
 
-    public AsynchronousServer() throws IOException {
+    AsynchronousServer(int m, ClientNumbers clientNumbers) throws IOException {
+        super(m, clientNumbers);
         ExecutorService serverThread = Executors.newSingleThreadExecutor();
         group = AsynchronousChannelGroup.withThreadPool(serverThread);
     }
@@ -38,9 +39,11 @@ public class AsynchronousServer extends Server {
     }
 
     @Override
-    public void close() {
+    public double close() throws IOException {
+        serverSocketChannel.close();
         group.shutdown();
         threadPool.shutdown();
+        return returnServerTime();
     }
 
     public void accept() throws IOException {
@@ -57,6 +60,7 @@ public class AsynchronousServer extends Server {
 
                         Info info = new Info();
                         LogWriter.writeToLog(logPath, "client accepted\n");
+                        clientNumbers.incClients();
                         channel.read(info.header, info, handler);
                     }
                 }
@@ -105,6 +109,7 @@ public class AsynchronousServer extends Server {
                                 info.source = ServerUtils.arrayToByteBuffer(data);
                                 info.action = "write";
                                 info.sourceSize = info.source.capacity();
+                                info.startTime = System.currentTimeMillis();
                                 LogWriter.writeToLog(logPath, "read data from client\n");
 
                                 channel.write(info.source, info, this);
@@ -120,10 +125,12 @@ public class AsynchronousServer extends Server {
                 info.sourceSize -= result;
                 if (info.sourceSize == 0) { // end of write
                     LogWriter.writeToLog(logPath, "send data to client\n");
+                    addTimes(info.startTime);
                     info.tasks--;
                     if (info.tasks == 0) {
                         try {
                             channel.close();
+                            clientNumbers.decClients();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -153,5 +160,6 @@ public class AsynchronousServer extends Server {
         int headerSize = 0;
         int sourceSize = 0;
         int tasks = x;
+        long startTime;
     }
 }
