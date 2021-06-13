@@ -5,16 +5,14 @@ import ru.hse.java.numbers.protos.Numbers;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousChannel;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class AsynchronousClient extends Client {
 
     public AsynchronousClient(int id, int n, int x, int delta) {
-        super(id, n, x, delta);
+        super(id, n, x, delta, "AsynchronousClientLog.txt");
     }
 
     @Override
@@ -27,7 +25,7 @@ public class AsynchronousClient extends Client {
                 while (source.hasRemaining()) {
                     channel.write(source);
                 }
-                System.out.println("Client #" + id + " send #" + i + " data to server");
+                LogWriter.writeToLog(logPath,"Client #" + id + " send #" + i + " data to server\n");
 
                 ByteBuffer receivingHeader = ByteBuffer.allocate(Integer.BYTES);
                 Future<Integer> receivedBytes;
@@ -49,7 +47,7 @@ public class AsynchronousClient extends Client {
                 Thread.sleep(delta);
             }
         } catch (IOException e) {
-            System.out.println("Lost connection to server");
+            LogWriter.writeToLog(logPath, "Lost connection to server\n");
         } catch (InterruptedException ignored) {
         } catch (ExecutionException e) {
             e.printStackTrace();

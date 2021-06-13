@@ -10,7 +10,7 @@ import java.nio.channels.SocketChannel;
 public class NonBlockingClient extends Client {
 
     public NonBlockingClient(int id, int n, int x, int delta) {
-        super(id, n, x, delta);
+        super(id, n, x, delta, "NonBlockingClientLog.txt");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class NonBlockingClient extends Client {
                 while (source.hasRemaining()) {
                     channel.write(source);
                 }
-                System.out.println("Client #" + id + " send #" + i + " data to server");
+                LogWriter.writeToLog(logPath, "Client #" + id + " send #" + i + " data to server\n");
 
                 ByteBuffer receivingHeader = ByteBuffer.allocate(Integer.BYTES);
                 int receivedBytes;
@@ -43,7 +43,7 @@ public class NonBlockingClient extends Client {
                 Thread.sleep(delta);
             }
         } catch (IOException e) {
-            System.out.println("Lost connection to server");
+            LogWriter.writeToLog(logPath, "Lost connection to server\n");
         } catch (InterruptedException ignored) {
         }
         return null;

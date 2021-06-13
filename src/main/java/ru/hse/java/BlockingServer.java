@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public class BlockingServer {
+public class BlockingServer extends Server {
+
+    private final Path logPath = LogWriter.createLogFile("BlockingServerLog.txt");
 
     private final ExecutorService serverSocketService = Executors.newSingleThreadExecutor();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 2);;
@@ -24,12 +27,14 @@ public class BlockingServer {
 
     private final ConcurrentHashMap.KeySetView<ClientData, Boolean> clients = ConcurrentHashMap.newKeySet();
 
+    @Override
     public void run() throws IOException {
         isWorking = true;
         serverSocket = new ServerSocket(Constants.PORT);
         serverSocketService.submit(this::acceptClient);
     }
 
+    @Override
     public void close() throws IOException {
         isWorking = false;
         serverSocket.close();
@@ -42,7 +47,7 @@ public class BlockingServer {
         try (ServerSocket ignored = serverSocket) {
             while (isWorking) {
                 Socket socket = serverSocket.accept();
-                System.out.println("client accepted");
+                LogWriter.writeToLog(logPath, "client accepted\n");
                 ClientData client = new ClientData(socket);
                 clients.add(client);
                 client.receiveFromClient();
@@ -75,6 +80,7 @@ public class BlockingServer {
                 try {
                     while (isReceiving) {
                         List<Integer> numbers = Numbers.parseDelimitedFrom(is).getNumbersList();
+                        LogWriter.writeToLog(logPath, "receive data from client\n");
                         threadPool.submit(() ->
                                 sendToClient(ServerUtils.bubbleSort(numbers.stream().mapToInt(Integer::intValue).toArray()))
                         );
@@ -92,6 +98,7 @@ public class BlockingServer {
                             .addAllNumbers(Arrays.stream(data).boxed().collect(Collectors.toList()));
                     numbers.setSize(data.length);
                     numbers.build().writeDelimitedTo(os);
+                    LogWriter.writeToLog(logPath, "send data to client\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

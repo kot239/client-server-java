@@ -10,7 +10,7 @@ import java.net.Socket;
 public class BlockingClient extends Client {
 
     public BlockingClient(int id, int n, int x, int delta) {
-        super(id, n, x, delta);
+        super(id, n, x, delta, "BlockingClientLog.txt");
     }
 
     @Override
@@ -21,14 +21,14 @@ public class BlockingClient extends Client {
             for (int i = 0; i < x; i++) {
                 Numbers data = generateData();
                 data.writeDelimitedTo(os);
-                System.out.println("Client #" + id + " send #" + i + " data to server");
+                LogWriter.writeToLog(logPath, "Client #" + id + " send #" + i + " data to server\n");
 
                 Numbers sortedData = Numbers.parseDelimitedFrom(is);
                 checkSorting(sortedData, i);
                 Thread.sleep(delta);
             }
         } catch (IOException e) {
-            System.out.println("Lost connection to server");
+            LogWriter.writeToLog(logPath,"Lost connection to server\n");
         } catch (InterruptedException ignored) {
         }
         return null;

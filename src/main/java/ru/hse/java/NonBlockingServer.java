@@ -9,16 +9,18 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
-public class NonBlockingServer {
+public class NonBlockingServer extends Server {
+
+    private final Path logPath = LogWriter.createLogFile("NonBlockingServerLog.txt");
+
     private final ExecutorService receivingThread = Executors.newSingleThreadExecutor();
     private final ExecutorService sendingThread = Executors.newSingleThreadExecutor();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 2);
@@ -34,6 +36,7 @@ public class NonBlockingServer {
 
     private final int x = 2;
 
+    @Override
     public void run() throws IOException {
         isWorking = true;
         serverSocketChannel = ServerSocketChannel.open();
@@ -43,6 +46,7 @@ public class NonBlockingServer {
         sendingThread.submit(this::sendMessages);
     }
 
+    @Override
     public void close() throws IOException {
         isWorking = false;
         serverSocketChannel.close();
@@ -63,12 +67,12 @@ public class NonBlockingServer {
                     if (key.isAcceptable()) {
                         SocketChannel socketChannel = serverSocketChannel.accept();
                         clients.put(socketChannel, new ClientData(socketChannel));
-                        System.out.println("client accepted");
+                        LogWriter.writeToLog(logPath, "client accepted\n");
                     }
                     if (key.isReadable()) {
                         ClientData client = clients.get((SocketChannel) key.channel());
                         client.receiveFromClient();
-                        System.out.println("receive data from client");
+                        LogWriter.writeToLog(logPath, "receive data from client\n");
                     }
                     iterator.remove();
                 }
@@ -95,7 +99,7 @@ public class NonBlockingServer {
                         if (client.isReady) {
                             client.sendToClient();
                             client.close();
-                            System.out.println("send data to client");
+                            LogWriter.writeToLog(logPath, "send data to client\n");
                         }
                     }
                     iterator.remove();
@@ -136,10 +140,8 @@ public class NonBlockingServer {
         public void receiveFromClient() throws IOException {
             ByteBuffer receivingHeader = ByteBuffer.allocate(Integer.BYTES);
             int receivedBytes;
-            int totalReceivedBytes = 0;
             do {
                 receivedBytes = socketChannel.read(receivingHeader);
-                totalReceivedBytes += receivedBytes;
             } while (receivedBytes > 0);
             receivingHeader.flip();
             int receivingSize = receivingHeader.getInt();
@@ -162,11 +164,8 @@ public class NonBlockingServer {
         public void sendToClient() {
             try {
                 ByteBuffer source = ServerUtils.arrayToByteBuffer(data);
-                int sendingSize = 0;
-                int curSending;
                 while (source.hasRemaining()) {
-                    curSending = socketChannel.write(source);
-                    sendingSize += curSending;
+                    socketChannel.write(source);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

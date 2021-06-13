@@ -10,11 +10,14 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class AsynchronousServer {
+public class AsynchronousServer extends Server {
+
+    private final Path logPath = LogWriter.createLogFile("AsynchronousServerLog.txt");
 
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 2);
     private final AsynchronousChannelGroup group;
@@ -27,19 +30,21 @@ public class AsynchronousServer {
         group = AsynchronousChannelGroup.withThreadPool(serverThread);
     }
 
+    @Override
     public void run() throws IOException {
         serverSocketChannel = AsynchronousServerSocketChannel.open(group);
         serverSocketChannel.bind(new InetSocketAddress(Constants.LOCALHOST, Constants.PORT));
         accept();
     }
 
+    @Override
     public void close() {
         group.shutdown();
         threadPool.shutdown();
     }
 
     public void accept() throws IOException {
-        while (true) {
+        //while (true) {
             serverSocketChannel.accept(null, new CompletionHandler<>() {
                 @Override
                 public void completed(AsynchronousSocketChannel channel, Object attachment) {
@@ -51,7 +56,7 @@ public class AsynchronousServer {
                         ClientHandler handler = new ClientHandler(channel);
 
                         Info info = new Info();
-                        System.out.println("accept client");
+                        LogWriter.writeToLog(logPath, "client accepted\n");
                         channel.read(info.header, info, handler);
                     }
                 }
@@ -60,8 +65,8 @@ public class AsynchronousServer {
                 public void failed(Throwable exc, Object attachment) {
                 }
             });
-            System.in.read();
-        }
+            //System.in.read();
+        //}
     }
 
     private class ClientHandler implements CompletionHandler<Integer, Info> {
@@ -83,7 +88,6 @@ public class AsynchronousServer {
                         info.header.flip();
                         info.sourceSize = info.header.getInt();
                         info.source = ByteBuffer.allocate(info.sourceSize);
-                        //System.out.println(info.sourceSize);
 
                         channel.read(info.source, info, this);
                     } else { // we read not enough
@@ -93,7 +97,6 @@ public class AsynchronousServer {
                 } else { // read source
                     info.sourceSize -= result;
                     if (info.sourceSize == 0) {
-                        //info.source.flip();
 
                         try {
                             List<Integer> numbers = Numbers.parseFrom(info.source.array()).getNumbersList();
@@ -102,7 +105,7 @@ public class AsynchronousServer {
                                 info.source = ServerUtils.arrayToByteBuffer(data);
                                 info.action = "write";
                                 info.sourceSize = info.source.capacity();
-                                System.out.println("read data from client");
+                                LogWriter.writeToLog(logPath, "read data from client\n");
 
                                 channel.write(info.source, info, this);
                             });
@@ -116,7 +119,7 @@ public class AsynchronousServer {
             } else if (info.action.equals("write")) {
                 info.sourceSize -= result;
                 if (info.sourceSize == 0) { // end of write
-                    System.out.println("send data to client");
+                    LogWriter.writeToLog(logPath, "send data to client\n");
                     info.tasks--;
                     if (info.tasks == 0) {
                         try {
