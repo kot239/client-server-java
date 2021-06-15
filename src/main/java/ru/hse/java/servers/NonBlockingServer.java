@@ -59,7 +59,6 @@ public class NonBlockingServer extends Server {
         isWorking = true;
         receivingThread.submit(this::receiveMessages);
         sendingThread.submit(this::sendMessages);
-        System.out.println("We start");
     }
 
     @Override
@@ -89,7 +88,6 @@ public class NonBlockingServer extends Server {
                         ClientData client = new ClientData();
                         clients.put(client.channel, client);
                         LogCSVWriter.writeToFile(logPath, "client accepted\n");
-                        //System.out.println("client accepted");
                     }
                     if (key.isReadable()) {
                         ClientData client = clients.get((SocketChannel) key.channel());
@@ -106,7 +104,6 @@ public class NonBlockingServer extends Server {
     public void sendMessages() {
         try {
             while (isWorking) {
-                //System.out.println("Read");
                 sendingSelector.selectNow();
                 Set<SelectionKey> keys = sendingSelector.selectedKeys();
                 Iterator<SelectionKey> iterator = keys.iterator();
@@ -159,11 +156,9 @@ public class NonBlockingServer extends Server {
             sourceRead = 0;
             sourceSize = -1;
             clientNumbers.incClients();
-            //System.out.println("create client data");
         }
 
         public void receive() throws IOException {
-            //System.out.println("Read");
             if (headerRead < Integer.BYTES) {
                 int bytes = channel.read(headerBuffer);
                 headerRead += bytes;
@@ -210,7 +205,7 @@ public class NonBlockingServer extends Server {
             if (clientNumbers.getNumber() == m) {
                 addTimes(startTime);
             }
-            //System.out.println("send data to client");
+            close();
         }
 
         public void task(List<Integer> numbers) {

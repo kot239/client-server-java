@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,6 +27,8 @@ public abstract class Client implements Callable<Double> {
     protected final List<Long> times = new LinkedList<>();
     protected final ClientNumbers clientNumbers;
     protected final CountDownLatch latch;
+    protected final ExecutorService sendingThread = Executors.newSingleThreadExecutor();
+    protected final ExecutorService receivingThread = Executors.newSingleThreadExecutor();
 
     protected Client(int id, int m, int n, int x, int delta,
                      String fileName, ClientNumbers clientNumbers, CountDownLatch latch) {
