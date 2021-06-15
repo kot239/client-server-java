@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,8 +24,10 @@ public abstract class Client implements Callable<Double> {
     protected final Path logPath;
     protected final List<Long> times = new LinkedList<>();
     protected final ClientNumbers clientNumbers;
+    protected final CountDownLatch latch;
 
-    protected Client(int id, int m, int n, int x, int delta, String fileName, ClientNumbers clientNumbers) {
+    protected Client(int id, int m, int n, int x, int delta,
+                     String fileName, ClientNumbers clientNumbers, CountDownLatch latch) {
         this.id = id;
         this.m = m;
         this.n = n;
@@ -32,6 +35,7 @@ public abstract class Client implements Callable<Double> {
         this.delta = delta;
         this.logPath = LogCSVWriter.createLogFile(fileName);
         this.clientNumbers = clientNumbers;
+        this.latch = latch;
     }
 
     protected Numbers generateData() {

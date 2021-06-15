@@ -39,6 +39,7 @@ public class AsynchronousServer extends Server {
 
     @Override
     public void run() throws IOException {
+        clientNumbers.setZero();
         serverSocketChannel = AsynchronousServerSocketChannel.open(group);
         serverSocketChannel.bind(new InetSocketAddress(Constants.LOCALHOST, Constants.PORT));
         accept();
@@ -107,7 +108,7 @@ public class AsynchronousServer extends Server {
                 } else { // read source
                     info.sourceSize -= result;
                     if (info.sourceSize == 0) {
-
+                        info.startTime = System.currentTimeMillis();
                         try {
                             List<Integer> numbers = Numbers.parseFrom(info.source.array()).getNumbersList();
                             threadPool.submit(() -> {
@@ -115,7 +116,6 @@ public class AsynchronousServer extends Server {
                                 info.source = ServerUtils.arrayToByteBuffer(data);
                                 info.action = "write";
                                 info.sourceSize = info.source.capacity();
-                                info.startTime = System.currentTimeMillis();
                                 LogCSVWriter.writeToFile(logPath, "read data from client\n");
 
                                 channel.write(info.source, info, this);

@@ -16,10 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -235,6 +232,7 @@ public class Main {
         ClientNumbers clients = new ClientNumbers();
         try {
             Path csvPath = LogCSVWriter.createCSVFile(csvFilename);
+            StringJoiner paramsForCSV = new StringJoiner(",");
             StringJoiner joiner = new StringJoiner(",");
             System.out.println("Start program");
             for (int paramValue = startParam; paramValue <= endParam; paramValue += stepParam) {
@@ -262,17 +260,18 @@ public class Main {
                         break;
                 }
                 server.run();
+                CountDownLatch latch = new CountDownLatch(m);
                 ExecutorService clientsThreadPool = Executors.newCachedThreadPool();
                 List<Future<Double>> futures = clientsThreadPool.invokeAll(
                         IntStream.range(0, m)
                                 .mapToObj(i ->  {
                                     switch (architecture) {
                                         case BLOCKING:
-                                            return new BlockingClient(i + 1, m, n, x, delta, clients);
+                                            return new BlockingClient(i + 1, m, n, x, delta, clients, latch);
                                         case NON_BLOCKING:
-                                            return new NonBlockingClient(i + 1, m, n, x, delta, clients);
+                                            return new NonBlockingClient(i + 1, m, n, x, delta, clients, latch);
                                         default:
-                                            return new AsynchronousClient(i + 1, m, n, x, delta, clients);
+                                            return new AsynchronousClient(i + 1, m, n, x, delta, clients, latch);
                                     }
                                 })
                                 .collect(Collectors.toList())
@@ -290,10 +289,14 @@ public class Main {
                         .mapToDouble(Double::doubleValue)
                         .filter(x -> x != -1d)
                         .count();
+                latch.await();
                 double serverTime = server.close();
+                paramsForCSV.add(Integer.toString(paramValue));
                 joiner.add(Double.toString(measuringTime ? clientsTime : serverTime));
                 System.out.println("Do param: " + paramValue);
             }
+            LogCSVWriter.writeToFile(csvPath, paramsForCSV.toString());
+            LogCSVWriter.writeToFile(csvPath, "\n");
             LogCSVWriter.writeToFile(csvPath, joiner.toString());
         } catch (IOException | ExecutionException | InterruptedException e) {
             e.printStackTrace();

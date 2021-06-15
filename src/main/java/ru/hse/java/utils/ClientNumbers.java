@@ -14,4 +14,8 @@ public class ClientNumbers {
     public synchronized int getNumber() {
         return numberClients;
     }
+
+    public synchronized void setZero() {
+        numberClients = 0;
+    }
 }

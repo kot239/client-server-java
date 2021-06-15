@@ -9,11 +9,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.CountDownLatch;
 
 public class NonBlockingClient extends Client {
 
-    public NonBlockingClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers) {
-        super(id, m, n, x, delta, "NonBlockingClientLog.txt", clientNumbers);
+    public NonBlockingClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers, CountDownLatch latch) {
+        super(id, m, n, x, delta, "NonBlockingClientLog.txt", clientNumbers, latch);
     }
 
     @Override
@@ -49,9 +50,12 @@ public class NonBlockingClient extends Client {
 
                 Thread.sleep(delta);
             }
+            latch.countDown();
+            //System.out.println("End client #" + id);
             return returnClientTime();
         } catch (IOException e) {
-            LogCSVWriter.writeToFile(logPath, "Lost connection to server\n");
+            LogCSVWriter.writeToFile(logPath, "Client #" + id + " lost connection to server\n");
+            e.printStackTrace();
         } catch (InterruptedException ignored) {
         }
         return -1d;

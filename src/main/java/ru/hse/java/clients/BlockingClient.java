@@ -9,11 +9,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 
 public class BlockingClient extends Client {
 
-    public BlockingClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers) {
-        super(id, m, n, x, delta, "BlockingClientLog.txt", clientNumbers);
+    public BlockingClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers, CountDownLatch latch) {
+        super(id, m, n, x, delta, "BlockingClientLog.txt", clientNumbers, latch);
     }
 
     @Override
@@ -34,6 +35,7 @@ public class BlockingClient extends Client {
                 checkSorting(sortedData, i);
                 Thread.sleep(delta);
             }
+            latch.countDown();
             return returnClientTime();
         } catch (IOException e) {
             LogCSVWriter.writeToFile(logPath,"Lost connection to server\n");

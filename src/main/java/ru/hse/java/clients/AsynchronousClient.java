@@ -9,13 +9,14 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class AsynchronousClient extends Client {
 
-    public AsynchronousClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers) {
-        super(id, m, n, x, delta, "AsynchronousClientLog.txt", clientNumbers);
+    public AsynchronousClient(int id, int m, int n, int x, int delta, ClientNumbers clientNumbers, CountDownLatch latch) {
+        super(id, m, n, x, delta, "AsynchronousClientLog.txt", clientNumbers, latch);
     }
 
     @Override
@@ -53,6 +54,7 @@ public class AsynchronousClient extends Client {
 
                 Thread.sleep(delta);
             }
+            latch.countDown();
             return returnClientTime();
         } catch (IOException e) {
             LogCSVWriter.writeToFile(logPath, "Lost connection to server\n");

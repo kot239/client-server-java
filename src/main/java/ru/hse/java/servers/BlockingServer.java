@@ -38,6 +38,7 @@ public class BlockingServer extends Server {
 
     @Override
     public void run() throws IOException {
+        clientNumbers.setZero();
         isWorking = true;
         serverSocket = new ServerSocket(Constants.PORT);
         serverSocketService.submit(this::acceptClient);
